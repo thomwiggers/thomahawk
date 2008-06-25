@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<tmx version="1.4">
+<header creationtool="Olifant" creationtoolversion="3.0.6.0" datatype="unkown" segtype="paragraph" adminlang="NL-NL" srclang="NL-NL" o-tmf="Olifant" creationdate="20080404T185230Z" creationid="Thom Wiggers" changedate="20080404T193110Z" changeid="Thom Wiggers">
+<prop type="x-olf-display">S2V5CcKccmVhZG9ubHk9McKcaW5zZXQxPTHCnGluc2V0Mj0xwpx3aWR0aD01MMKccGVyY2VudD0w
+wpx2aXNpYmxlPTHCnHNlYXJjaD0wwpxsYW5nPcKcc3lzdGVtPTHCnHJpZ2h0dG9sZWZ0PTDCnG9y
+ZGVyPS0xwpxwbGlzdD1gwpwKRmxhZwnCnHJlYWRvbmx5PTDCnGluc2V0MT0xwpxpbnNldDI9McKc
+d2lkdGg9NTDCnHBlcmNlbnQ9MMKcdmlzaWJsZT0xwpxzZWFyY2g9MMKcbGFuZz3CnHN5c3RlbT0w
+wpxyaWdodHRvbGVmdD0wwpxvcmRlcj0tMcKccGxpc3Q9YMKcCklECcKccmVhZG9ubHk9MMKcaW5z
+ZXQxPTDCnGluc2V0Mj0wwpx3aWR0aD01MMKccGVyY2VudD0wwpx2aXNpYmxlPTDCnHNlYXJjaD0w
+wpxsYW5nPcKcc3lzdGVtPTDCnHJpZ2h0dG9sZWZ0PTDCnG9yZGVyPS0xwpxwbGlzdD1gwpwKTWF0
+Y2gJwpxyZWFkb25seT0wwpxpbnNldDE9MMKcaW5zZXQyPTDCnHdpZHRoPTUwwpxwZXJjZW50PTDC
+nHZpc2libGU9MMKcc2VhcmNoPTDCnGxhbmc9wpxzeXN0ZW09McKccmlnaHR0b2xlZnQ9MMKcb3Jk
+ZXI9LTHCnHBsaXN0PWDCnApUZXh0X05MX05MCcKccmVhZG9ubHk9MMKcaW5zZXQxPTHCnGluc2V0
+Mj0xwpx3aWR0aD01MMKccGVyY2VudD0xwpx2aXNpYmxlPTHCnHNlYXJjaD0xwpxsYW5nPU5MX05M
+wpxzeXN0ZW09MMKccmlnaHR0b2xlZnQ9MMKcb3JkZXI9LTHCnHBsaXN0PWDCnApUZXh0X0VOX1VT
+CcKccmVhZG9ubHk9MMKcaW5zZXQxPTHCnGluc2V0Mj0xwpx3aWR0aD01MMKccGVyY2VudD0xwpx2
+aXNpYmxlPTHCnHNlYXJjaD0wwpxsYW5nPUVOX1VTwpxzeXN0ZW09MMKccmlnaHR0b2xlZnQ9MMKc
+b3JkZXI9LTHCnHBsaXN0PWDCnAo=</prop></header>
+<body>
+<tu>
+<tuv xml:lang="NL-NL">
+<seg>Startpagina</seg>
+</tuv>
+<tuv xml:lang="EN-US">
+<seg>Start</seg>
+</tuv>
+</tu>
+<tu>
+<tuv xml:lang="NL-NL">
+<seg />
+</tuv>
+<tuv xml:lang="EN-US">
+<seg />
+</tuv>
+</tu>
+</body>
+</tmx>
