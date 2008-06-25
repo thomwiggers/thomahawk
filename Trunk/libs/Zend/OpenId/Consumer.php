@@ -18,7 +18,7 @@
  * @subpackage Zend_OpenId_Consumer
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Consumer.php 8064 2008-02-16 10:58:39Z thomas $
+ * @version    $Id: Consumer.php 9399 2008-05-07 14:16:06Z dmitry $
  */
 
 /**
@@ -58,7 +58,7 @@ class Zend_OpenId_Consumer
      *
      * @var Zend_OpenId_Consumer_Storage $_storage
      */
-    private $_storage = null;
+    protected $_storage = null;
 
     /**
      * Enables or disables consumer to use association with server based on
@@ -66,7 +66,7 @@ class Zend_OpenId_Consumer
      *
      * @var Zend_OpenId_Consumer_Storage $_dumbMode
      */
-    private $_dumbMode = false;
+    protected $_dumbMode = false;
 
     /**
      * Internal cache to prevent unnecessary access to storage
@@ -188,6 +188,14 @@ class Zend_OpenId_Consumer
             $identity = "";
         }
 
+        if ($version < 2.0 && !isset($params["openid_claimed_id"])) {
+            require_once "Zend/Session/Namespace.php";
+            $session = new Zend_Session_Namespace("openid");
+            if ($session->identity == $identity) {
+                $identity = $session->claimed_id;
+            }
+        }
+
         if (empty($params['openid_return_to']) ||
             empty($params['openid_signed']) ||
             empty($params['openid_sig']) ||
@@ -198,18 +206,16 @@ class Zend_OpenId_Consumer
             return false;
         }
 
-        if ($version >= 2.0 &&
-            (empty($params['openid_response_nonce']) ||
-             empty($params['openid_op_endpoint']))) {
-            return false;
-        }
-
-        /* OpenID 2.0 (11.3) Checking the Nonce */
-        if (isset($params['openid_response_nonce'])) {
-            if (!$this->_storage->isUniqueNonce($params['openid_response_nonce'])) {
+        if ($version >= 2.0) {
+            if (empty($params['openid_response_nonce']) ||
+                empty($params['openid_op_endpoint'])) {
+                return false;
+            /* OpenID 2.0 (11.3) Checking the Nonce */
+            } else if (!$this->_storage->isUniqueNonce($params['openid_op_endpoint'], $params['openid_response_nonce'])) {
                 return false;
             }
         }
+
 
         if (!empty($params['openid_invalidate_handle'])) {
             if ($this->_storage->getAssociationByHandle(
@@ -290,7 +296,10 @@ class Zend_OpenId_Consumer
                 $params2[$key] = $val;
             }
             $params2['openid.mode'] = 'check_authentication';
-            $ret = $this->_httpRequest($server, 'POST', $params2);
+            $ret = $this->_httpRequest($server, 'POST', $params2, $status);
+            if ($status != 200) {
+                return false;
+            }
             $r = array();
             if (is_string($ret)) {
                 foreach(explode("\n", $ret) as $line) {
@@ -386,10 +395,11 @@ class Zend_OpenId_Consumer
      * @param string $url OpenID server url
      * @param string $method HTTP request method 'GET' or 'POST'
      * @param array $params additional qwery parameters to be passed with
+     * @param int &$staus HTTP status code
      *  request
      * @return mixed
      */
-    protected function _httpRequest($url, $method = 'GET', array $params = array())
+    protected function _httpRequest($url, $method = 'GET', array $params = array(), &$status = null)
     {
         $client = $this->_httpClient;
         if ($client === null) {
@@ -419,8 +429,10 @@ class Zend_OpenId_Consumer
         } catch (Exception $e) {
             return false;
         }
-        if ($response->getStatus() == 200) {
-            return $response->getBody();
+        $status = $response->getStatus();
+        $body = $response->getBody();
+        if ($status == 200 || ($status == 400 && !empty($body))) {
+            return $body;
         }else{
             return false;
         }
@@ -483,23 +495,43 @@ class Zend_OpenId_Consumer
         $params['openid.dh_consumer_public'] = base64_encode(
             Zend_OpenId::btwoc($dh_details['pub_key']));
 
-        $ret = $this->_httpRequest($url, 'POST', $params);
-        if ($ret === false) {
-            return false;
-        }
+        while(1) {
+            $ret = $this->_httpRequest($url, 'POST', $params, $status);
+            if ($ret === false) {
+                return false;
+            }
 
-        $r = array();
-        foreach(explode("\n", $ret) as $line) {
-            $line = trim($line);
-            if (!empty($line)) {
-                $x = explode(':', $line, 2);
-                if (is_array($x) && count($x) == 2) {
-                    list($key, $value) = $x;
-                    $r[trim($key)] = trim($value);
+            $r = array();
+            foreach(explode("\n", $ret) as $line) {
+                $line = trim($line);
+                if (!empty($line)) {
+                    $x = explode(':', $line, 2);
+                    if (is_array($x) && count($x) == 2) {
+                        list($key, $value) = $x;
+                        $r[trim($key)] = trim($value);
+                    }
                 }
             }
+            $ret = $r;
+
+            if (isset($ret['error_code']) &&
+                $ret['error_code'] == 'unsupported-type') {
+                if ($params['openid.session_type'] == 'DH-SHA256') {
+                    $params['openid.session_type'] = 'DH-SHA1';
+                    $params['openid.assoc_type'] = 'HMAC-SHA1';
+                } else if ($params['openid.session_type'] == 'DH-SHA1') {
+                    $params['openid.session_type'] = 'no-encryption';
+                } else {
+                    return false;
+                }
+            } else {
+                break;
+            }
         }
-        $ret = $r;
+
+        if ($status != 200) {
+            return false;
+        }
 
         if ($version >= 2.0 &&
             isset($ret['ns']) &&
@@ -601,30 +633,30 @@ class Zend_OpenId_Consumer
         /* TODO: OpenID 2.0 (7.3) XRI and Yadis discovery */
 
         /* HTML-based discovery */
-        $response = $this->_httpRequest($id);
-        if (!is_string($response)) {
+        $response = $this->_httpRequest($id, 'GET', array(), $status);
+        if ($status != 200 || !is_string($response)) {
             return false;
         }
         if (preg_match(
-                '/<link[^>]*rel=(["\'])openid2.provider\\1[^>]*href=(["\'])([^"\']+)\\2[^>]*\/?>/i',
+                '/<link[^>]*rel=(["\'])[ \t]*(?:[^ \t"\']+[ \t]+)*?openid2.provider[ \t]*[^"\']*\\1[^>]*href=(["\'])([^"\']+)\\2[^>]*\/?>/i',
                 $response,
                 $r)) {
             $version = 2.0;
             $server = $r[3];
         } else if (preg_match(
-                '/<link[^>]*href=(["\'])([^"\']+)\\1[^>]*rel=(["\'])openid2.provider\\3[^>]*\/?>/i',
+                '/<link[^>]*href=(["\'])([^"\']+)\\1[^>]*rel=(["\'])[ \t]*(?:[^ \t"\']+[ \t]+)*?openid2.provider[ \t]*[^"\']*\\3[^>]*\/?>/i',
                 $response,
                 $r)) {
             $version = 2.0;
             $server = $r[2];
         } else if (preg_match(
-                '/<link[^>]*rel=(["\'])openid.server\\1[^>]*href=(["\'])([^"\']+)\\2[^>]*\/?>/i',
+                '/<link[^>]*rel=(["\'])[ \t]*(?:[^ \t"\']+[ \t]+)*?openid.server[ \t]*[^"\']*\\1[^>]*href=(["\'])([^"\']+)\\2[^>]*\/?>/i',
                 $response,
                 $r)) {
             $version = 1.1;
             $server = $r[3];
         } else if (preg_match(
-                '/<link[^>]*href=(["\'])([^"\']+)\\1[^>]*rel=(["\'])openid.server\\3[^>]*\/?>/i',
+                '/<link[^>]*href=(["\'])([^"\']+)\\1[^>]*rel=(["\'])[ \t]*(?:[^ \t"\']+[ \t]+)*?openid.server[ \t]*[^"\']*\\3[^>]*\/?>/i',
                 $response,
                 $r)) {
             $version = 1.1;
@@ -634,24 +666,24 @@ class Zend_OpenId_Consumer
         }
         if ($version >= 2.0) {
             if (preg_match(
-                    '/<link[^>]*rel=(["\'])openid2.local_id\\1[^>]*href=(["\'])([^"\']+)\\2[^>]*\/?>/i',
+                    '/<link[^>]*rel=(["\'])[ \t]*(?:[^ \t"\']+[ \t]+)*?openid2.local_id[ \t]*[^"\']*\\1[^>]*href=(["\'])([^"\']+)\\2[^>]*\/?>/i',
                     $response,
                     $r)) {
                 $realId = $r[3];
             } else if (preg_match(
-                    '/<link[^>]*href=(["\'])([^"\']+)\\1[^>]*rel=(["\'])openid2.local_id\\3[^>]*\/?>/i',
+                    '/<link[^>]*href=(["\'])([^"\']+)\\1[^>]*rel=(["\'])[ \t]*(?:[^ \t"\']+[ \t]+)*?openid2.local_id[ \t]*[^"\']*\\3[^>]*\/?>/i',
                     $response,
                     $r)) {
                 $realId = $r[2];
             }
         } else {
             if (preg_match(
-                    '/<link[^>]*rel=(["\'])openid.delegate\\1[^>]*href=(["\'])([^"\']+)\\2[^>]*\/?>/i',
+                    '/<link[^>]*rel=(["\'])[ \t]*(?:[^ \t"\']+[ \t]+)*?openid.delegate[ \t]*[^"\']*\\1[^>]*href=(["\'])([^"\']+)\\2[^>]*\/?>/i',
                     $response,
                     $r)) {
                 $realId = $r[3];
             } else if (preg_match(
-                    '/<link[^>]*href=(["\'])([^"\']+)\\1[^>]*rel=(["\'])openid.delegate\\3[^>]*\/?>/i',
+                    '/<link[^>]*href=(["\'])([^"\']+)\\1[^>]*rel=(["\'])[ \t]*(?:[^ \t"\']+[ \t]+)*?openid.delegate[ \t]*[^"\']*\\3[^>]*\/?>/i',
                     $response,
                     $r)) {
                 $realId = $r[2];
@@ -719,6 +751,13 @@ class Zend_OpenId_Consumer
 
         $params['openid.claimed_id'] = $claimedId;
 
+        if ($version <= 2.0) {
+            require_once "Zend/Session/Namespace.php";
+            $session = new Zend_Session_Namespace("openid");
+            $session->identity = $id;
+            $session->claimed_id = $claimedId;
+        }
+
         if (isset($handle)) {
             $params['openid.assoc_handle'] = $handle;
         }
@@ -728,7 +767,7 @@ class Zend_OpenId_Consumer
         if (empty($root)) {
             $root = Zend_OpenId::selfUrl();
             if ($root[strlen($root)-1] != '/') {
-            	$root = dirname($root);
+                $root = dirname($root);
             }
         }
         if ($version >= 2.0) {

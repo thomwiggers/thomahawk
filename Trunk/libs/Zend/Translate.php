@@ -19,6 +19,9 @@
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 
+/**
+ * @see Zend_Loader
+ */
 require_once 'Zend/Loader.php';
 
 
@@ -107,7 +110,7 @@ class Zend_Translate {
                 break;
         }
 
-        @Zend_Loader::loadClass($adapter);
+        Zend_Loader::loadClass($adapter);
         if (self::$_cache !== null) {
             call_user_func(array($adapter, 'setCache'), self::$_cache);
         }

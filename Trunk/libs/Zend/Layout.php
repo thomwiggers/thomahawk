@@ -16,7 +16,7 @@
  * @package    Zend_Layout
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Layout.php 8064 2008-02-16 10:58:39Z thomas $
+ * @version    $Id: Layout.php 9358 2008-05-05 12:22:35Z matthew $
  */
 
 /**
@@ -502,6 +502,7 @@ class Zend_Layout
     public function getView() 
     {
         if (null === $this->_view) {
+            require_once 'Zend/Controller/Action/HelperBroker.php';
             $viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer');
             if (null === $viewRenderer->view) {
                 $viewRenderer->initView();

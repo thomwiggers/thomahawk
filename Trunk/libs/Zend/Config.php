@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Zend Framework
  *
@@ -17,7 +16,7 @@
  * @package    Zend_Config
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Config.php 8064 2008-02-16 10:58:39Z thomas $
+ * @version    $Id: Config.php 9384 2008-05-05 19:02:58Z doctorrock83 $
  */
 
 
@@ -87,7 +86,7 @@ class Zend_Config implements Countable, Iterator
      * @param  boolean $allowModifications
      * @return void
      */
-    public function __construct($array, $allowModifications = false)
+    public function __construct(array $array, $allowModifications = false)
     {
         $this->_allowModifications = (boolean) $allowModifications;
         $this->_loadedSection = null;

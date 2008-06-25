@@ -17,8 +17,7 @@
  * @subpackage Zend_InfoCard
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Exception.php 8064 2008-02-16 10:58:39Z thomas $
- * @author     John Coggeshall <john@zend.com>
+ * @version    $Id: Exception.php 9125 2008-04-03 21:22:31Z thomas $
  */
 
 if (class_exists("Zend_Exception")) {
@@ -38,7 +37,6 @@ if (class_exists("Zend_Exception")) {
  * @package    Zend_InfoCard
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @author     John Coggeshall <john@zend.com>
  */
 class Zend_InfoCard_Exception extends Zend_InfoCard_Exception_Abstract
 {

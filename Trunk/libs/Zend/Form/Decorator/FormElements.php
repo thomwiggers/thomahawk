@@ -37,7 +37,7 @@ require_once 'Zend/Form/Decorator/Abstract.php';
  * @subpackage Decorator
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: FormElements.php 8064 2008-02-16 10:58:39Z thomas $
+ * @version    $Id: FormElements.php 9406 2008-05-08 13:56:45Z matthew $
  */
 class Zend_Form_Decorator_FormElements extends Zend_Form_Decorator_Abstract
 {
@@ -71,6 +71,10 @@ class Zend_Form_Decorator_FormElements extends Zend_Form_Decorator_Abstract
                     $item->setElementsBelongTo($name, true);
                 } else {
                     $item->setElementsBelongTo($belongsTo, true);
+                }
+            } elseif (!empty($belongsTo) && ($item instanceof Zend_Form_DisplayGroup)) {
+                foreach ($item as $element) {
+                    $element->setBelongsTo($belongsTo);
                 }
             }
             $items[] = $item->render();

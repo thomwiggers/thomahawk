@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Zend Framework
  *
@@ -18,7 +17,7 @@
  * @subpackage Adapter
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Abstract.php 8491 2008-02-29 22:36:55Z peptolab $
+ * @version    $Id: Abstract.php 9136 2008-04-04 13:58:29Z thomas $
  */
 
 
@@ -814,7 +813,7 @@ abstract class Zend_Db_Adapter_Abstract
         } else {
             while ($count > 0) {
                 if (strpos($text, '?') != false) {
-                    $text = substr_replace($text, $this->quote($value), strpos($text, '?'), 1);
+                    $text = substr_replace($text, $this->quote($value, $type), strpos($text, '?'), 1);
                 }
                 --$count;
             }

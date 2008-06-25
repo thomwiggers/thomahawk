@@ -28,7 +28,7 @@ require_once 'Zend/Validate/Interface.php';
  * @package    Zend_Form
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Form.php 8634 2008-03-07 17:54:50Z matthew $
+ * @version    $Id: Form.php 9402 2008-05-07 21:40:07Z matthew $
  */
 class Zend_Form implements Iterator, Countable, Zend_Validate_Interface
 {
@@ -206,7 +206,19 @@ class Zend_Form implements Iterator, Countable, Zend_Validate_Interface
             $this->setConfig($options);
         }
 
+        // Extensions...
+        $this->init();
+
         $this->loadDefaultDecorators();
+    }
+
+    /**
+     * Initialize form (used by extending classes)
+     * 
+     * @return void
+     */
+    public function init()
+    {
     }
 
     /**
@@ -459,6 +471,10 @@ class Zend_Form implements Iterator, Countable, Zend_Validate_Interface
 
         foreach ($this->getElements() as $element) {
             $element->addPrefixPath($prefix, $path, $type);
+        }
+
+        foreach ($this->getSubForms() as $subForm) {
+            $subForm->addElementPrefixPath($prefix, $path, $type);
         }
 
         return $this;
@@ -811,6 +827,7 @@ class Zend_Form implements Iterator, Countable, Zend_Validate_Interface
 
         $this->_order[$name] = $this->_elements[$name]->getOrder();
         $this->_orderUpdated = true;
+        $this->_setElementsBelongTo($name);
 
         return $this;
     }
@@ -942,7 +959,7 @@ class Zend_Form implements Iterator, Countable, Zend_Validate_Interface
      */
     public function getElement($name)
     {
-        if (isset($this->_elements[$name])) {
+        if (array_key_exists($name, $this->_elements)) {
             return $this->_elements[$name];
         }
         return null;
@@ -1159,17 +1176,49 @@ class Zend_Form implements Iterator, Countable, Zend_Validate_Interface
      */
     public function setElementsBelongTo($array)
     {
+        $origName = $this->getElementsBelongTo();
         $name = $this->filterName($array, true);
         if (empty($name)) {
             $name = null;
         }
         $this->_elementsBelongTo = $name;
 
-        (null !== $name) 
-            ? $this->setIsArray(true) 
-            : $this->setIsArray(false);
+        if (null === $name) {
+            $this->setIsArray(false);
+            if (null !== $origName) {
+                $this->_setElementsBelongTo();
+            }
+        } else {
+            $this->setIsArray(true);
+            $this->_setElementsBelongTo();
+        }
 
         return $this;
+    }
+
+    /**
+     * Set array to which elements belong
+     * 
+     * @param  string $name Element name
+     * @return void
+     */
+    protected function _setElementsBelongTo($name = null)
+    {
+        $array = $this->getElementsBelongTo();
+
+        if (null === $array) {
+            return;
+        }
+
+        if (null === $name) {
+            foreach ($this->getElements() as $element) {
+                $element->setBelongsTo($array);
+            }
+        } else {
+            if (null !== ($element = $this->getElement($name))) {
+                $element->setBelongsTo($array);
+            }
+        }
     }
 
     /**
@@ -2067,8 +2116,15 @@ class Zend_Form implements Iterator, Countable, Zend_Validate_Interface
     {
         $decorator = $this->getDecorator($name);
         if ($decorator) {
-            $name = get_class($decorator);
-            unset($this->_decorators[$name]);
+            if (array_key_exists($name, $this->_decorators)) {
+                unset($this->_decorators[$name]);
+            } else {
+                $class = get_class($decorator);
+                if (!array_key_exists($class, $this->_decorators)) {
+                    return false;
+                }
+                unset($this->_decorators[$class]);
+            }
             return true;
         }
 
@@ -2492,7 +2548,7 @@ class Zend_Form implements Iterator, Countable, Zend_Validate_Interface
             foreach ($this->_order as $key => $order) {
                 if (null === $order) {
                     if (null === ($order = $this->{$key}->getOrder())) {
-                        if (array_search($index, $this->_order, true)) {
+                        while (array_search($index, $this->_order, true)) {
                             ++$index;
                         }
                         $items[$index] = $key;

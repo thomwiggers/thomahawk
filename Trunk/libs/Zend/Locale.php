@@ -15,7 +15,7 @@
  * @category   Zend
  * @package    Zend_Locale
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
- * @version    $Id: Locale.php 8486 2008-02-29 21:29:27Z thomas $
+ * @version    $Id: Locale.php 8927 2008-03-20 19:33:47Z thomas $
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 
@@ -112,7 +112,7 @@ class Zend_Locale {
      *  4. Framework Standard
      *
      * @param  string  $locale  OPTIONAL locale for parsing input
-     * @return object
+     * @throws Zend_Locale_Exception
      */
     public function __construct($locale = null)
     {
@@ -174,7 +174,7 @@ class Zend_Locale {
      * Standard Searchorder is
      * - getBrowser
      * - getEnvironment
-     * @todo - getFramework
+     * - getFramework
      *
      * @param $searchorder  - OPTIONAL searchorder
      * @param $fastsearch   - OPTIONAL returnes the first found locale array when true
@@ -227,6 +227,8 @@ class Zend_Locale {
      * Sets a new default locale
      *
      * @param String $locale
+     * @return boolean
+     * @throws Zend_Locale_Exception
      */
     public static function setDefault($locale)
     {
@@ -358,6 +360,8 @@ class Zend_Locale {
 
     /**
      * Returns the locale which the framework is set to
+     * 
+     * @return array
      */
     public function getFramework()
     {
@@ -423,7 +427,7 @@ class Zend_Locale {
     /**
      * Returns the region part of the locale if available
      *
-     * @return region
+     * @return string|false - Regionstring
      */
     public function getRegion()
     {
@@ -438,7 +442,8 @@ class Zend_Locale {
 
     /**
      * Return the accepted charset of the client
-     * @todo verify working
+     * 
+     * @return string
      */
     public function getHttpCharset()
     {

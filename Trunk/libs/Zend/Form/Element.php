@@ -32,18 +32,16 @@ require_once 'Zend/Validate/Interface.php';
  * @subpackage Element
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Element.php 8757 2008-03-11 19:56:18Z matthew $
+ * @version    $Id: Element.php 9423 2008-05-08 18:59:02Z matthew $
  */
 class Zend_Form_Element implements Zend_Validate_Interface
 {
-    /**#@+
-     * Constants
-     * @const string
+    /**
+     * Element Constants
      */
     const DECORATOR = 'DECORATOR';
     const FILTER    = 'FILTER';
     const VALIDATE  = 'VALIDATE';
-    /**#@-*/
 
     /**
      * Default view helper to use
@@ -221,9 +219,23 @@ class Zend_Form_Element implements Zend_Validate_Interface
         }
 
         /**
+         * Extensions
+         */
+        $this->init();
+
+        /**
          * Register ViewHelper decorator by default
          */
         $this->loadDefaultDecorators();
+    }
+
+    /**
+     * Initialize object; used by extending classes
+     * 
+     * @return void
+     */
+    public function init()
+    {
     }
 
     /**
@@ -406,8 +418,8 @@ class Zend_Form_Element implements Zend_Validate_Interface
      */
     public function setName($name)
     {
-        $name = $this->filtername($name);
-        if (('0' !== $name) && empty($name)) {
+        $name = $this->filterName($name);
+        if ('' === $name) {
             require_once 'Zend/Form/Exception.php';
             throw new Zend_Form_Exception('Invalid name provided; must contain only valid variable characters and be non-empty');
         }
@@ -1128,6 +1140,7 @@ class Zend_Form_Element implements Zend_Validate_Interface
     public function clearValidators()
     {
         $this->_validators = array();
+        return $this;
     }
 
     /**
@@ -1149,7 +1162,10 @@ class Zend_Form_Element implements Zend_Validate_Interface
         $this->setValue($value);
         $value = $this->getValue();
 
-        if (empty($value) && !$this->isRequired() && $this->getAllowEmpty()) {
+        if ((('' === $value) || (null === $value)) 
+            && !$this->isRequired() 
+            && $this->getAllowEmpty()
+        ) {
             return true;
         }
 
@@ -1186,8 +1202,7 @@ class Zend_Form_Element implements Zend_Validate_Interface
                 if ($result) {
                     continue;
                 }
-            }
-            if ($validator->isValid($value, $context)) {
+            } elseif ($validator->isValid($value, $context)) {
                 continue;
             } else {
                 $result = false;
@@ -1565,8 +1580,12 @@ class Zend_Form_Element implements Zend_Validate_Interface
     {
         $decorator = $this->getDecorator($name);
         if ($decorator) {
-            $name = get_class($decorator);
-            unset($this->_decorators[$name]);
+            if (array_key_exists($name, $this->_decorators)) {
+                unset($this->_decorators[$name]);
+            } else {
+                $class = get_class($decorator);
+                unset($this->_decorators[$class]);
+            }
             return true;
         }
 

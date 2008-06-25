@@ -25,7 +25,7 @@
  * @package    Zend_Form
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: DisplayGroup.php 8605 2008-03-06 21:53:14Z matthew $
+ * @version    $Id: DisplayGroup.php 9365 2008-05-05 15:40:30Z matthew $
  */
 class Zend_Form_DisplayGroup implements Iterator,Countable
 {
@@ -125,7 +125,19 @@ class Zend_Form_DisplayGroup implements Iterator,Countable
             $this->setConfig($options);
         }
 
+        // Extensions...
+        $this->init();
+
         $this->loadDefaultDecorators();
+    }
+
+    /**
+     * Initialize object; used by extending classes
+     * 
+     * @return void
+     */
+    public function init()
+    {
     }
 
     /**
@@ -737,8 +749,12 @@ class Zend_Form_DisplayGroup implements Iterator,Countable
     {
         $decorator = $this->getDecorator($name);
         if ($decorator) {
-            $name = get_class($decorator);
-            unset($this->_decorators[$name]);
+            if (array_key_exists($name, $this->_decorators)) {
+                unset($this->_decorators[$name]);
+            } else {
+                $class = get_class($decorator);
+                unset($this->_decorators[$class]);
+            }
             return true;
         }
 
@@ -958,7 +974,7 @@ class Zend_Form_DisplayGroup implements Iterator,Countable
             $index = 0;
             foreach ($elementOrder as $key => $order) {
                 if (null === $order) {
-                    if (array_search($index, $elementOrder, true)) {
+                    while (array_search($index, $elementOrder, true)) {
                         ++$index;
                     }
                     $items[$index] = $key;

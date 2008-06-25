@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Zend Framework
  *
@@ -588,7 +587,7 @@ abstract class Zend_Db_Table_Row_Abstract
      */
     public function toArray()
     {
-        return $this->_data;
+        return (array)$this->_data;
     }
 
     /**

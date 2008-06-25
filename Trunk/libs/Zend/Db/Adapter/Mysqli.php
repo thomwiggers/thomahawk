@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Zend Framework
  *
@@ -18,7 +17,7 @@
  * @subpackage Adapter
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Mysqli.php 8080 2008-02-16 21:37:28Z thomas $
+ * @version    $Id: Mysqli.php 9136 2008-04-04 13:58:29Z thomas $
  */
 
 
@@ -170,7 +169,7 @@ class Zend_Db_Adapter_Mysqli extends Zend_Db_Adapter_Abstract
     public function describeTable($tableName, $schemaName = null)
     {
         /**
-         * @todo: use INFORMATION_SCHEMA someday when
+         * @todo  use INFORMATION_SCHEMA someday when
          * MySQL's implementation isn't too slow.
          */
 

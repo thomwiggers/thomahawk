@@ -16,7 +16,7 @@
  * @package    Zend_Locale
  * @subpackage Format
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
- * @version    $Id: Format.php 8544 2008-03-04 20:55:31Z thomas $
+ * @version    $Id: Format.php 8969 2008-03-21 18:12:46Z thomas $
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 
@@ -497,6 +497,8 @@ class Zend_Locale_Format
      */
     public static function isNumber($input, array $options = array())
     {
+        $options = array_merge(self::$_Options, self::checkOptions($options));
+
         // Get correct signs for this locale
         $symbols = Zend_Locale_Data::getList($options['locale'],'symbols');
 

@@ -32,10 +32,20 @@ require_once 'Zend/Form/Decorator/Abstract.php';
  * @subpackage Decorator
  * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: Fieldset.php 8064 2008-02-16 10:58:39Z thomas $
+ * @version    $Id: Fieldset.php 9313 2008-04-25 16:22:55Z matthew $
  */
 class Zend_Form_Decorator_Fieldset extends Zend_Form_Decorator_Abstract
 {
+    /**
+     * Attribs that should be removed prior to rendering
+     * @var array
+     */
+    public $stripAttribs = array(
+        'name',
+        'action',
+        'method',
+    );
+
     /**
      * Fieldset legend
      * @var string
@@ -123,6 +133,12 @@ class Zend_Form_Decorator_Fieldset extends Zend_Form_Decorator_Abstract
             }
 
             $attribs['legend'] = $legend;
+        }
+
+        foreach ($this->stripAttribs as $attrib) {
+            if (array_key_exists($attrib, $attribs)) {
+                unset($attribs[$attrib]);
+            }
         }
 
         return $view->fieldset($element->getName(), $content, $attribs);
