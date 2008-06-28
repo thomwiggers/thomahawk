@@ -1,16 +1,9 @@
 <?php
 // Dit bestand gaat de categoerie weergeven
-set_error_handler('Thomahawk_Errorhandler');
+//set_error_handler('Thomahawk_Errorhandler');
 //libs bij include path
 $dir = realpath(dirname(__FILE__)."/../../..");
 set_include_path($dir . '/libs/' . PATH_SEPARATOR . get_include_path());
-
-//Smarty
-require_once('../libs/Smarty/Smarty.class.php');
-$smarty = new Smarty();
-$smarty->template_dir = '../smarty_templates/';
-$smarty->config_dir = '../smarty_configs/';
-$smarty->compile_dir = '../smarty_templates_comp/';
 
 $cid = (!empty($_GET['cid']) ? $_GET['cid'] : /**
 											 *  Terug naar index
@@ -52,7 +45,7 @@ for($i = 1; $i >= $count; ++$i){
 	if ($ini->$cid->db->$fieldno->display) {
 		$descs = $ini->$cid->db->$fieldno->desc;
 		if ($ini->$cid->db->$fieldno->link->isLinked) { //joins
-			if (!$joinedwith{$ini->$cid->db->$fieldno->link->with}){
+			if ($ini->$cid->db->$fieldno->link->with){
 				$select->join(array($ini->$cid->db->$fieldno->link->with), 	$ini->$cid->name . "." . $ini->$cid->db->$fieldno->name . 
 																			" = " .
 																			$ini->$cid->db->$fieldno->link->with . "." . 
@@ -70,8 +63,7 @@ for($i = 1; $i >= $count; ++$i){
 	}
 }
 
-
-$select->from($db_ini->db->prefix . $id, $cols);
+$select->from($db_ini->db->prefix . $cid, $cols);
 if (!empty($item_id)) {
 	$select->where('id = ?', $item_id);
 }
@@ -87,6 +79,7 @@ $log = new Thomahawk_Log('../', $auth->getIdentity());
 $log->view("Displayed: " . $cid . "|". $item_id . "|" . $item_name);
 $log = null;
 
-$smarty->assign('descs', $descs);
-$smarty->assign('result', $result->fetch());
-$smarty->display('display_cat.tpl');
+$template = array();
+
+$template['descs'] = $descs;
+$template['result'] = $result->fetch();
