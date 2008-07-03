@@ -1,9 +1,14 @@
 <?php
-// Dit bestand gaat de categoerie weergeven
-//set_error_handler('Thomahawk_Errorhandler');
 //libs bij include path
-$dir = realpath(dirname(__FILE__)."/../../..");
+$dir = realpath(dirname(__FILE__)."/..");
 set_include_path($dir . '/libs/' . PATH_SEPARATOR . get_include_path());
+
+//Zend Loader
+require_once('Zend/Loader.php');
+Zend_Loader::registerAutoload();
+
+// Dit bestand gaat de categoerie weergeven
+set_error_handler('Thomahawk_Errorhandler');
 
 $cid = (!empty($_GET['cid']) ? $_GET['cid'] : /**
 											 *  Terug naar index
@@ -13,9 +18,7 @@ $item_name = (!empty($_GET['name'])? $_GET['name']: "");
 
 $offset = (!empty($_GET['next'])? $_GET['next']: 0);
 
-//Zend Loader
-require_once('Zend/Loader.php');
-Zend_Loader::registerAutoload();
+
 $auth = Zend_Auth::getInstance();
 if (!$auth->hasIdentity()) {
 	/**
@@ -79,7 +82,10 @@ $log = new Thomahawk_Log('../', $auth->getIdentity());
 $log->view("Displayed: " . $cid . "|". $item_id . "|" . $item_name);
 $log = null;
 
+//TEMPLATE 
+/*
+ * TODO: LOTS OF WORK TO DO met template
+ */
 $template = array();
-
-$template['descs'] = $descs;
+$template['descs']  = $descs;
 $template['result'] = $result->fetch();
