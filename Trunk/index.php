@@ -1,5 +1,4 @@
 <?php
-//set_error_handler('Thomahawk_Errorhandler'); //eerst includen
 try {
 //libs bij include path
 $dir = realpath(dirname(__FILE__)); //Klopt waarschijnlijk niet
@@ -14,8 +13,11 @@ $template = array();
 
 require_once('Zend/Loader.php');
 Zend_Loader::registerAutoload();
+set_error_handler('Thomahawk_Errorhandler');
+
 $auth = Zend_Auth::getInstance();
 $identity = $auth->getIdentity();
+
 
 //log starten
 $log = new Thomahawk_Log('./', $identity);
