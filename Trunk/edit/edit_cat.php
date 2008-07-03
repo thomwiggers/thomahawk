@@ -1,43 +1,41 @@
 <?php
 accelerator_set_status(true);
 
-$cid = (isset($_GET['cid']) && !empty($_GET['cid']) ? $_GET['cid'] : "");
-$id  = (isset($_GET['id'])  && !empty($_GET['id']) ? $_GET['id'] : "");
+$cid = (isset($_GET['cid']) && !empty($_GET['cid']) ? $_GET['cid'] : ""); //categorie_id
+$id  = (isset($_GET['id'])  && !empty($_GET['id']) ? $_GET['id'] : "");		//id
+$name = (isset($_GET['name'])  && !empty($_GET['name']) ? $_GET['name'] : "");	//naam
+$offset = (isset($_GET['offset'])  && !empty($_GET['offset']) ? $_GET['offset'] : 0); //offset
 
+//zend loader
 require_once('Zend/Loader.php');
 Zend_Loader::registerAutoload();
 
-try{
-//Smarty
-require('libs/Smarty/Smarty.class.php');
-$smarty = new Smarty();
-$smarty->template_dir = 'smarty_templates/';
-$smarty->config_dir = 'smarty_configs/';
-$smarty->compile_dir = 'smarty_templates_comp/';
-}catch (Exception $e){
-	die ("Fatal Error: Smarty failed to start" . $e->__toString());
-}
+//Template var
+$template = array();
 
+//zend auth
 $auth = Zend_Auth::getInstance();
-$auth->getIdentity();
+$identity = $auth->getIdentity();
 
+// Th log
 $log = new Thomahawk_Log('./', $identity);
 
+// cat inf
 $ini = new Zend_Config_Ini('../conf/categorie.ini', $cid);
+//db inf
 $db_ini = new Zend_Config_Ini('../conf/config.ini', 'database');
 
 if (isset($_GET['submit'])) {
-	$log->edit($ini->name . " => " . $id );
-	
-	$db = Zend_Db::factory('mysqli', $db_ini->db->toArray());
-	$cols = array();
+	$log->edit($ini->name . " => " . $id ); //loggen
+	$db = Zend_Db::factory('mysqli', $db_ini->db->toArray()); //$db instance
+	$cols = array();	//array van colommen
 	for($i = 1; $i >= $ini->db->field->count; ++$i){
 		$fieldno = (string) "field" . (string) $id;
 		$cols[] = $ini->db->$fieldno->name . " => " . $_GET[$ini->db->$fieldno->name];
 	}
-	$select = $db->update($cat, $cols, 'id = ' . $id);
-	$smarty->assign('melding', "Update uitgevoerd");
-	$smarty->display('edit.tpl');
+	$select = $db->update($cid, $cols, 'id = ' . $id);
+	$template['melding']= "Update uitgevoerd";
+	$template['page'] = 'edit';
 }
 
 $count = $ini->$cid->db->field->count;
@@ -45,10 +43,6 @@ $cols = array();
 for($i = 1; $i >= $count; ++$i){
 	$fieldno = (string) "field" . (string) $i;
 	if ($ini->$cid->db->$fieldno->display) {
-		if($ini->$cid->db->$fieldno->special->aes){
-			$cols[] = new Zend_Db_Expr('AES_DECRYPT('.$ini->$cid->db->$fieldno->name.', '. $ini->db->field.$i->special->aes->key . ")");
-			continue;
-		}
 		$cols[] = $ini->$cid->db->$fieldno->name;
 	}
 }
@@ -58,11 +52,11 @@ $db = Zend_Db::factory('mysqli', $db_ini->db->toArray());
 $select = $db->select();
 
 $select->from($db_ini->db->prefix . $id, $cols);
-if (!empty($item_id)) {
-	$select->where('id = ?', $item_id);
+if (!empty($id)) {
+	$select->where('id = ?', $id);
 }
-if (!empty($item_name)) {
-	$select->where('* = REGEXP(?)', $item_name);
+if (!empty($name)) {
+	$select->where('* = REGEXP(?)', $name);
 }
 $select->limit(50, $offset);
 
