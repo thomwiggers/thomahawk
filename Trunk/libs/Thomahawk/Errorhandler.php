@@ -1,5 +1,5 @@
 <?php
-function errorhandler($msg, $code, $errfile, $errline, $errcontext){
+function Thomahawk_Errorhandler($msg, $code, $errfile, $errline, $errcontext, $log){
 	if( isset($log)){
 		$e = new Exception($msg, $code);
 		$log->logException($e);

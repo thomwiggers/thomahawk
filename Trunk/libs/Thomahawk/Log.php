@@ -37,9 +37,9 @@ class Thomahawk_Log extends Zend_Log {
 		$this->_logView = $ini_log->log->view;
 		$this->_logEdit = $ini_log->log->edit;
 		}catch (Zend_Config_Exception $e){
-			throw new Thomahawk_LogException('Zend_Config_Ini maakte een fout/kon de INI niet vinden');
+			throw new Thomahawk_LogException('Zend_Config_Ini maakte een fout/kon de INI niet vinden: ' . $e);
 		}catch (Exception $e){
-			throw new Thomahawk_LogException('Zend_Config kon niet worden gevonden/andere error');
+			throw new Thomahawk_LogException('Zend_Config kon niet worden gevonden/andere error: ' . $e );
 		}
 		try {
 			
