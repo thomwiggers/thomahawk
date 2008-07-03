@@ -54,11 +54,6 @@ for($i = 1; $i >= $count; ++$i){
 																			$ini->$cid->db->$fieldno->link->with . "." . 
 																			$ini->$cid->db->$fieldno->link->externalkey);
 			}
-			if($ini->$cid->db->$fieldno->special->aes){
-				$cols[] = new Zend_Db_Expr('AES_DECRYPT('. $ini->$cid->db->$fieldno->link->with . "." . $ini->$cid->db->$fieldno->name.', 
-														'. $ini->db->field.$i->special->aes->key . ")");
-				continue;
-			}
 			$cols[] = $ini->$cid->db->$fieldno->link->with . "." . $ini->$cid->db->$fieldno->link->externalfieldname;
 			continue;
 		}
