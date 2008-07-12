@@ -1,4 +1,6 @@
 <?php
+//initialiseren
+require_once 'inc/initialisatie.php';
 
 //categorien beschikbaar maken
 $cat = new Zend_Config_Ini('conf/categorie.ini');

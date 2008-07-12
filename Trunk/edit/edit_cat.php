@@ -1,4 +1,6 @@
 <?php
+//initialiseren
+require_once 'inc/initialisatie.php';
 
 // GET vars
 $cid = (isset($_GET['cid']) && !empty($_GET['cid']) ? $_GET['cid'] : ''); //categorie_id
@@ -6,9 +8,9 @@ $id  = (isset($_GET['id'])  && !empty($_GET['id']) ? $_GET['id'] : '');		//id
 $name = (isset($_GET['name'])  && !empty($_GET['name']) ? $_GET['name'] : '');	//naam
 $offset = (isset($_GET['offset'])  && !empty($_GET['offset']) ? $_GET['offset'] : 0); //offset
 
-// cat inf
+// cat info
 $ini = new Zend_Config_Ini('../conf/categorie.ini', $cid);
-//db inf
+//db info
 $db_ini = new Zend_Config_Ini('../conf/config.ini', 'database');
 
 if (isset($_GET['submit'])) {

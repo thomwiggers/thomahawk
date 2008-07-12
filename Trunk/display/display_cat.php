@@ -1,4 +1,8 @@
 <?php
+
+//initialiseren
+require_once 'inc/initialisatie.php';
+
 //GET vars ophalen
 $cid = (!empty($_GET['cid']) ? $_GET['cid'] : /*  Terug naar index */ "");
 $item_id   = (!empty($_GET['iid']) ? $_GET['iid'] : "");
