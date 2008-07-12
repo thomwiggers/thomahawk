@@ -78,8 +78,8 @@ $log->view("Displayed: " . $cid . "|". $item_id . "|" . $item_name);
 $log = null;
 
 //TEMPLATE 
-/*
- * TODO: LOTS OF WORK TO DO met template
+/**
+ * @TODO: LOTS OF WORK TO DO met template
  */
 $template = array();
 $template['descs']  = $descs;
