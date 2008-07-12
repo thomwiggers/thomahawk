@@ -1,11 +1,17 @@
 <?php
-//accelerator aan
-accelerator_set_status(true);
-
 try {
-//libs bij include path
-$dir = realpath(dirname(__FILE__)); //Klopt waarschijnlijk niet
-set_include_path($dir . '/libs/' . PATH_SEPARATOR . get_include_path());
+	//bepalen hoe diep we moeten graven tot root
+	//$depth is diepte
+
+	$downpath = '/';
+	while ($depth) {
+		$downpath .= '../';
+		--$depth;
+	}
+	echo $downpath . "\n";
+	//libs bij include path
+	$dir = realpath(dirname(__FILE__) . $downpath); //Klopt waarschijnlijk niet
+	set_include_path($dir . DIRECTORY_SEPARATOR . 'libs' . DIRECTORY_SEPARATOR . PATH_SEPARATOR . get_include_path());
 }catch (Exception $e){
 	die ('Zend_Framework kan niet worden toegevoegd aan include_path ' . $e->__toString());
 }
@@ -15,6 +21,7 @@ $template = array();
 
 require_once('Zend/Loader.php');
 Zend_Loader::registerAutoload();
+Zend_Loader::loadFile('Thomahawk/Errorhandler.php');
 set_error_handler('Thomahawk_Errorhandler');
 
 //Zend_Auth
@@ -36,6 +43,7 @@ if($identity) {
 	$template['error'] = $taal->_('U bent niet ingelogd');
 	$template['page']  = 'login';
 }
+
 //log starten
 $log = new Thomahawk_Log('./', $identity);
 

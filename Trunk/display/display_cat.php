@@ -1,6 +1,6 @@
 <?php
-
 //initialiseren
+$depth = 1;
 require_once 'inc/initialisatie.php';
 
 //GET vars ophalen
