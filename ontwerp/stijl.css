@@ -1,0 +1,120 @@
+@charset "utf-8";
+.titelbalk {
+	height: 100px;
+	width: 100%;
+	position: absolute;
+	visibility: visible;
+	z-index: auto;
+	left: 0px;
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+}
+.tabbalk {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12pt;
+	font-style: normal;
+	line-height: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: capitalize;
+	text-decoration: none;
+	height: 25px;
+	width: 100%;
+	position: absolute;
+	visibility: visible;
+	z-index: auto;
+	left: 0px;
+	top: 100px;
+	background-color: #666666;
+}
+.suboptiesbalk {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12pt;
+	font-style: normal;
+	line-height: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: capitalize;
+	text-decoration: none;
+	height: 25px;
+	width: 100%;
+	position: absolute;
+	z-index: auto;
+	left: 0px;
+	top: 125px;
+	visibility: visible;
+	background-color: #333333;
+	color: #CCCCCC;
+	padding-left: 5px;
+}
+.suboptie {
+	font-family: inherit;
+	background-color: #333333;
+	color: #CCCCCC;
+	border-right: solid;
+	border-right-width: thin;
+	vertical-align: middle;
+	padding-right: 10px;
+	margin: 0px 0px 0px 5px;
+	height: 25px;
+	font-size: 21px;
+}
+.body	{
+	font-family: "Times New Roman", Times, serif;
+	font-size: medium;
+	z-index:auto;
+	width: 70%;
+	position: relative;
+	left: 15%;
+	top: 175px;
+	background-color: #333333;
+	opacity: 0.75;
+	padding-top: 25px;
+	padding-bottom: 50px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+	
+.tab {
+	background-repeat: no-repeat;
+	text-align: center;
+	vertical-align: middle;
+	table-layout: auto;
+	width: 154px;
+	height: 25px;
+	background-image: url(tab.gif);
+	background-color: #666666;
+	position: relative;
+	left: 8px;
+	top: 0px;
+	display: block;
+	float:left;
+	color: #333333;
+	text-decoration: none;
+}
+
+.tab a:hover{
+	text-decoration: underline
+}
+
+img.logo {
+	position:absolute;
+	top: 7px;
+	left: 48px;
+	height: 84px;
+}
+
+.gebruikersgegevens {
+	position: absolute;
+	right: 63px;
+	top: 7px;
+	border-width: 1px;
+	cursor:  default;
+	padding: 10px;
+}
+
+legend {
+	font-family: Tahoma, "MS Sans Serif", Geneva, sans-serif;
+	font-size:   8.25pt;
+}
