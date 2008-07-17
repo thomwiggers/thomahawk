@@ -40,12 +40,6 @@ class Manage_Acl {
 	private $Acl_Html_Table;
 	
 	/**
-	 * Constanten voor Display_Acl
-	 */
-	const ALL	= 0;
-	const GROUP = 1;
-
-	/**
 	 * Constructor van class die $acl instelt
 	 *
 	 * @param Zend_Acl $acl
@@ -60,50 +54,65 @@ class Manage_Acl {
 	}
 		
 	/**
-	 * Class die acltabel in $this->
+	 * Class die acltabel in $this->Acl_Html_Table opslaat
 	 *
 	 * @param string $what wat wil je hebben?
 	 */
 	function Display_Acl($what = null){
 		if (empty($what) || !is_string($what)){
-			if (!is_array($this->roles)){
-				$this->setRoles();
-				$this->setResources();
-				foreach($this->resources as $res){
-					$html = '<h3 class=\'aclheader\'>' . $res . '<table>' .
-							'<tr><th>Group</th><th>Permission</th></tr>';
-					foreach ($this->roles as $rol){
-						$html .= '<tr><td>'.$rol.'</td><td>'.($this->acl->isAllowed($rol, $res)?'Allowed':'Denied').'</td></tr>';
-					}
-					$html .= '</table>';
-					$this->Acl_Html_Table = $html;
+			$this->setRoles(); //rollen binnenhalen
+			$this->setResources(); //zelfde voor resources
+			foreach($this->resources as $res){ //header van tabel
+				$html = '<h3 class=\'aclheader\'>' . $res . '<table>' .
+						'<tr><th>Group</th><th>Permission</th></tr>';
+				foreach ($this->roles as $rol){//de rijen
+					$html .= '<tr><td>'.$rol.'</td><td>'.($this->acl->isAllowed($rol, $res)?'Allowed':'Denied').'</td></tr>';
 				}
+				$html .= '</table>'; //afsluiting
 			}
+			$this->Acl_Html_Table = $html;
+		}else { //als $what NIET leeg is
+			if ($this->acl->has($what)){ //is het een Resource?
+				$html = '<h3 class=\'aclheader\'>' . $what . '<table>' .
+				'<tr><th>Group</th><th>Permission</th></tr>';
+				foreach ($this->roles as $rol){//de rijen
+					$html .= '<tr><td>'.$rol.'</td><td>'.($this->acl->isAllowed($rol, $what)?'Allowed':'Denied').'</td></tr>';
+				}
+			}elseif ($this->acl->hasRole($what)){ //of is het een Role
+				$html = '<h3 class=\'aclheader\'>' . $what . '<table>' .
+				'<tr><th>Resource</th><th>Permission</th></tr>';
+				foreach ($this->resources as $res){//de rijen
+					$html .= '<tr><td>'.$res.'</td><td>'.($this->acl->isAllowed($what, $res)?'Allowed':'Denied').'</td></tr>';
+				}	
+			}
+			$html .= '</table>';
+			$this->Acl_Html_Table = $html;
 		}
 	}
-	
-	
-	
+
 	/**
 	 * Deze functie zet de rollen in $roles als een array
 	 *
 	 */
 	function setRoles(){
-		/**
-		 * Statement maken
-		 * 
-		 * Dit zoekt alle verschillende rollen bij elkaar
-		 */
-		$this->setDb;
-		$select = $this->db->select();
-		$select->from($this->prefix . 'users', 'role');
-		$select->distinct();
-		$this->roles = $this->db->fetchAll($select);
-		
+		if (empty($this->roles)){
+			/**
+			 * Statement maken
+			 * 
+			 * Dit zoekt alle verschillende rollen bij elkaar
+			 */
+			$this->setDb;
+			$select = $this->db->select();
+			$select->from($this->prefix . 'users', 'role');
+			$select->distinct();
+			$this->roles = $this->db->fetchAll($select);
+		}
 	}
 	function setResources(){
-		require_once '../conf/resources.php';
-		$this->resources = $resources;
+		if (empty($this->resources)){
+			require_once '../conf/resources.php';
+			$this->resources = $resources;
+		}
 	}
 	function setDb(){
 		if (empty($this->db)){
@@ -121,13 +130,9 @@ class Manage_Acl {
 	}
 	function EchoAcl_Html_Table(){
 		echo $this->Acl_Html_Table;
-	}
+	}	
 }
 
 class Manage_Acl_Exception extends Exception {
 	
 }
-
-
-
-?>
