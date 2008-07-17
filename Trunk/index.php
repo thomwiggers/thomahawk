@@ -1,6 +1,7 @@
 <?php
 //initialiseren
 $depth = 0;
+$resource = 'index';
 require_once 'inc/initialisatie.php';
 
 //categorien beschikbaar maken

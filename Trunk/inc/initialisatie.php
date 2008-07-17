@@ -1,17 +1,19 @@
 <?php
 try {
-	//bepalen hoe diep we moeten graven tot root
-	//$depth is diepte
-
-	$downpath = '/';
-	while ($depth) {
-		$downpath .= '../';
-		--$depth;
+	if (!strstr(get_include_path(), 'Zend')){
+		
+		//bepalen hoe diep we moeten graven tot root
+		//$depth is diepte
+		$downpath = '/';
+		while ($depth) {
+			$downpath .= '../';
+			--$depth;
+		}
+		echo $downpath . "\n";
+		//libs bij include path
+		$dir = realpath(dirname(__FILE__) . $downpath); //Klopt waarschijnlijk niet
+		set_include_path($dir . DIRECTORY_SEPARATOR . 'libs' . DIRECTORY_SEPARATOR . PATH_SEPARATOR . get_include_path());
 	}
-	echo $downpath . "\n";
-	//libs bij include path
-	$dir = realpath(dirname(__FILE__) . $downpath); //Klopt waarschijnlijk niet
-	set_include_path($dir . DIRECTORY_SEPARATOR . 'libs' . DIRECTORY_SEPARATOR . PATH_SEPARATOR . get_include_path());
 }catch (Exception $e){
 	die ('Zend_Framework kan niet worden toegevoegd aan include_path ' . $e->__toString());
 }
@@ -30,10 +32,11 @@ $identity = $auth->getIdentity();
 
 //$acl beschikbaar maken.
 unserialize(file("inc/acl.php"));
-
+$acl = Zend_Acl();
 //controleer of is authed en dan ACL role ophalen
 if($identity) {
 	$acl_role = $auth->getStorage()->read('ACL_role');
+	$acl->isAllowed($acl_role, $resource);
 } else {
 	/**
 	 * Hier moet code zodat de  

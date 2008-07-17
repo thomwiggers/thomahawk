@@ -1,6 +1,7 @@
 <?php
 //initialiseren
 $depth = 1;
+$resource = 'display_cat';
 require_once 'inc/initialisatie.php';
 
 //GET vars ophalen
