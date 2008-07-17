@@ -7,6 +7,7 @@
 $depth = 1;
 $resource = 'manage_acl';
 require_once '../inc/initialisatie.php';
+
 /**
  * class die Acl beheert
  *
@@ -26,6 +27,17 @@ class Manage_Acl {
 	 * @var array
 	 */
 	private $roles;
+	/**
+	 * @var array
+	 */
+	private $resources;
+	
+	/**
+	 * String met het resultaat van Display_Acl
+	 * 
+	 * @var string
+	 */
+	private $Acl_Html_Table;
 	
 	/**
 	 * Constanten voor Display_Acl
@@ -48,23 +60,35 @@ class Manage_Acl {
 	}
 		
 	/**
-	 * Class die acl gaat weergeven
+	 * Class die acltabel in $this->
 	 *
-	 * @param Array $array_what structuur: wat, zoekterm
+	 * @param string $what wat wil je hebben?
 	 */
 	function Display_Acl($what = null){
 		if (empty($what) || !is_string($what)){
 			if (!is_array($this->roles)){
-				$this->getRoles();
-				
+				$this->setRoles();
+				$this->setResources();
+				foreach($this->resources as $res){
+					$html = '<h3 class=\'aclheader\'>' . $res . '<table>' .
+							'<tr><th>Group</th><th>Permission</th></tr>';
+					foreach ($this->roles as $rol){
+						$html .= '<tr><td>'.$rol.'</td><td>'.($this->acl->isAllowed($rol, $res)?'Allowed':'Denied').'</td></tr>';
+					}
+					$html .= '</table>';
+					$this->Acl_Html_Table = $html;
+				}
 			}
 		}
 	}
+	
+	
+	
 	/**
 	 * Deze functie zet de rollen in $roles als een array
 	 *
 	 */
-	function getRoles(){
+	function setRoles(){
 		/**
 		 * Statement maken
 		 * 
@@ -77,7 +101,10 @@ class Manage_Acl {
 		$this->roles = $this->db->fetchAll($select);
 		
 	}
-	
+	function setResources(){
+		require_once '../conf/resources.php';
+		$this->resources = $resources;
+	}
 	function setDb(){
 		if (empty($this->db)){
 			$ini = new Zend_Config_Ini('../conf/config.ini');
@@ -88,6 +115,12 @@ class Manage_Acl {
 			$this->prefix = $ini->db->prefix;
 			unset($ini);
 		}
+	}
+	function GetAcl_Html_Table(){
+		return $this->Acl_Html_Table;
+	}
+	function EchoAcl_Html_Table(){
+		echo $this->Acl_Html_Table;
 	}
 }
 
