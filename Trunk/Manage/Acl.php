@@ -89,7 +89,7 @@ class Manage_Acl {
 			$this->Acl_Html_Table = $html;
 		}
 	}
-
+	
 	/**
 	 * Deze functie zet de rollen in $roles als een array
 	 *
