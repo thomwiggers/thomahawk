@@ -108,7 +108,7 @@ class Manage_Acl
         '"><input type="radio" name="' . $rol . '_' . $res . '"' . 'value="allow" checked="' .
         ($this->acl->isAllowed($rol, $res) ? 'checked' : '') .'" />Allowed</label>' . '<label for="' . $rol .
         '_' . $res . '"><input type="radio" name="' . $rol . '_' . $res . '" value="deny" checked="' .
-        ($this->acl->isAllowed($rol, $res) ? '' : 'checked') . '" />Denied</label></td></tr>';
+        ($this->acl->isAllowed($rol, $res) ? '' : 'checked') . '" />Denied</label></td><td id="ajaxStatus_"'. $rol.'_'.$res .'" ></td></tr>';
         return $html;
     }
     /**
@@ -157,6 +157,42 @@ class Manage_Acl
     {
         echo $this->Acl_Html_Table;
     }
+    /**
+     * jQuery insluiten met de code voor het dynamisch wijzigen van de permissies
+     *
+     */
+    function Echo_jquery_code(){
+    	?>
+		<script type="text/javascript" src="../libs/jquery.js"/>
+		<script type="text/javascript">
+		<!--
+		$(document).ready(function(){
+			$("input :radio").change(function(){
+					$("td #ajaxStatus_"+ this.attr("name")).html("processing");
+					$.ajax({
+					type: "POST",
+					data: this.serialize ,
+					error: function(){alert("Error! AJAX request failed");},
+					success: function(data, textStatus){ if( $("status", data) == "OK") {
+						$("td #ajaxStatus_"+ this.attr("name")).html("Updated!");
+						}else{
+						$("td #ajaxStatus_"+ this.attr("name")).html("Failed!!").addClass("error!");
+						alert("Error! " + $("message", data));
+						}
+
+					},
+					completed: function(){
+						wait(5000);
+						$("td #ajaxStatus_"+ this.attr("name")).html('');
+					}
+					})
+					}
+			);
+			});
+		--//>
+		</script>
+    	<?php
+   }
 }
 class Manage_Acl_Exception extends Exception
 {}
