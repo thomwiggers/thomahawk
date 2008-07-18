@@ -196,7 +196,7 @@ class Thomahawk_Acl
 	function Echo_jquery_code ()
 	{
 		if (! headers_sent()) {
-			trigger_error('jQuery verstuurd VOOR <html><head>!', E_NOTICE);
+			trigger_error('jQuery verstuurd VOOR <html><head>!', E_USER_NOTICE);
 		}
 		?>
 <script type="text/javascript" src="../libs/jquery.js"></script>
