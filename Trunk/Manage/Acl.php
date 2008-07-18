@@ -31,14 +31,14 @@ class Manage_Acl {
 	 * @var array
 	 */
 	private $resources;
-	
+
 	/**
 	 * String met het resultaat van Display_Acl
-	 * 
+	 *
 	 * @var string
 	 */
 	private $Acl_Html_Table;
-	
+
 	/**
 	 * Constructor van class die $acl instelt
 	 *
@@ -52,7 +52,7 @@ class Manage_Acl {
 		}
 		$this->acl = $acl;
 	}
-		
+
 	/**
 	 * Class die acltabel in $this->Acl_Html_Table opslaat
 	 *
@@ -63,33 +63,43 @@ class Manage_Acl {
 			$this->setRoles(); //rollen binnenhalen
 			$this->setResources(); //zelfde voor resources
 			foreach($this->resources as $res){ //header van tabel
-				$html = '<h3 class=\'aclheader\'>' . $res . '<table>' .
+				$html = '<h3 class="aclheader">' . $res . '<table>' .
 						'<tr><th>Group</th><th>Permission</th></tr>';
 				foreach ($this->roles as $rol){//de rijen
-					$html .= '<tr><td>'.$rol.'</td><td>'.($this->acl->isAllowed($rol, $res)?'Allowed':'Denied').'</td></tr>';
+					$html .= '<tr><td>'.$rol.'</td><td><label for="'.$rol.'_'.$res.'"><input type="radio" name="'.$rol.'_'.$res.'"'.
+					'value="allow" checked="'.($this->acl->isAllowed($rol, $res)?'checked':'').'" />Allowed</label>'.
+					'<label for="'.$rol.'_'.$res.'"><input type="radio" name="'.$rol.'_'.$res.'" value="deny" checked="'.
+					($this->acl->isAllowed($rol, $res)?'':'checked').'" />Denied</label></td></tr>';
 				}
 				$html .= '</table>'; //afsluiting
 			}
 			$this->Acl_Html_Table = $html;
 		}else { //als $what NIET leeg is
 			if ($this->acl->has($what)){ //is het een Resource?
-				$html = '<h3 class=\'aclheader\'>' . $what . '<table>' .
+			    $res = $what;
+			    $html = '<h3 class=\'aclheader\'>' . $res . '<table>' .
 				'<tr><th>Group</th><th>Permission</th></tr>';
 				foreach ($this->roles as $rol){//de rijen
-					$html .= '<tr><td>'.$rol.'</td><td>'.($this->acl->isAllowed($rol, $what)?'Allowed':'Denied').'</td></tr>';
+					$html .= '<tr><td>'.$rol.'</td><td><label for="'.$rol.'_'.$res.'"><input type="radio" name="'.$rol.'_'.$res.'" '.
+					'value="allow" checked="'.($this->acl->isAllowed($rol, $res)?'checked':'').'" />Allowed</label>'.
+					'<label for="'.$rol.'_'.$res.'"><input type="radio" name="'.$rol.'_'.$res.'" value="deny" checked="'.
+					($this->acl->isAllowed($rol, $res)?'':'checked').'" />Denied</label></td></tr>';
 				}
 			}elseif ($this->acl->hasRole($what)){ //of is het een Role
 				$html = '<h3 class=\'aclheader\'>' . $what . '<table>' .
 				'<tr><th>Resource</th><th>Permission</th></tr>';
 				foreach ($this->resources as $res){//de rijen
-					$html .= '<tr><td>'.$res.'</td><td>'.($this->acl->isAllowed($what, $res)?'Allowed':'Denied').'</td></tr>';
-				}	
+					$html .= '<tr><td>'.$res.'</td><td><input type="radio" name="'.$rol.'_'.$res.'" '.
+					'value="allow" checked="'.($this->acl->isAllowed($rol, $res)?'checked':'').'" />Allowed</label>'.
+					'<label for="'.$rol.'_'.$res.'"><input type="radio" name="'.$rol.'_'.$res.'" value="deny" checked="'.
+					($this->acl->isAllowed($rol, $res)?'':'checked').'" />Denied</label></td></tr>';
+				}
 			}
 			$html .= '</table>';
 			$this->Acl_Html_Table = $html;
 		}
 	}
-	
+
 	/**
 	 * Deze functie zet de rollen in $roles als een array
 	 *
@@ -98,7 +108,7 @@ class Manage_Acl {
 		if (empty($this->roles)){
 			/**
 			 * Statement maken
-			 * 
+			 *
 			 * Dit zoekt alle verschillende rollen bij elkaar
 			 */
 			$this->setDb;
@@ -130,9 +140,9 @@ class Manage_Acl {
 	}
 	function EchoAcl_Html_Table(){
 		echo $this->Acl_Html_Table;
-	}	
+	}
 }
 
 class Manage_Acl_Exception extends Exception {
-	
+
 }
