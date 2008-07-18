@@ -11,6 +11,7 @@ require_once '../inc/initialisatie.php';
 /**
  * class die Acl beheert
  *
+ * @throws Manage_Acl_Exception
  */
 class Manage_Acl {
 	/**
@@ -39,6 +40,9 @@ class Manage_Acl {
 	 */
 	private $Acl_Html_Table;
 
+	const ROLE     = 0;
+	const RESOURCE = 1;
+
 	/**
 	 * Constructor van class die $acl instelt
 	 *
@@ -62,44 +66,55 @@ class Manage_Acl {
 		if (empty($what) || !is_string($what)){
 			$this->setRoles(); //rollen binnenhalen
 			$this->setResources(); //zelfde voor resources
-			foreach($this->resources as $res){ //header van tabel
-				$html = '<h3 class="aclheader">' . $res . '<table>' .
-						'<tr><th>Group</th><th>Permission</th></tr>';
-				foreach ($this->roles as $rol){//de rijen
-					$html .= '<tr><td>'.$rol.'</td><td><label for="'.$rol.'_'.$res.'"><input type="radio" name="'.$rol.'_'.$res.'"'.
-					'value="allow" checked="'.($this->acl->isAllowed($rol, $res)?'checked':'').'" />Allowed</label>'.
-					'<label for="'.$rol.'_'.$res.'"><input type="radio" name="'.$rol.'_'.$res.'" value="deny" checked="'.
-					($this->acl->isAllowed($rol, $res)?'':'checked').'" />Denied</label></td></tr>';
+			$html = '';
+			foreach ($this->resources as $res){
+			    $html .= '<h3 class=\'aclheader\'>' . $res . '<table>' .
+				'<tr><th>Group</th><th>Permission</th></tr>';
+				foreach ($this->roles as $rol){
+				    $this->makeHtmlTableRow($res, $rol, MANAGE_ACL::ROLE);
 				}
-				$html .= '</table>'; //afsluiting
 			}
-			$this->Acl_Html_Table = $html;
-		}else { //als $what NIET leeg is
+			}else { //als $what NIET leeg is
 			if ($this->acl->has($what)){ //is het een Resource?
 			    $res = $what;
 			    $html = '<h3 class=\'aclheader\'>' . $res . '<table>' .
 				'<tr><th>Group</th><th>Permission</th></tr>';
 				foreach ($this->roles as $rol){//de rijen
-					$html .= '<tr><td>'.$rol.'</td><td><label for="'.$rol.'_'.$res.'"><input type="radio" name="'.$rol.'_'.$res.'" '.
-					'value="allow" checked="'.($this->acl->isAllowed($rol, $res)?'checked':'').'" />Allowed</label>'.
-					'<label for="'.$rol.'_'.$res.'"><input type="radio" name="'.$rol.'_'.$res.'" value="deny" checked="'.
-					($this->acl->isAllowed($rol, $res)?'':'checked').'" />Denied</label></td></tr>';
+				    $html .=$this->makeHtmlTableRow($what, $rol, $this->ROLE);
 				}
 			}elseif ($this->acl->hasRole($what)){ //of is het een Role
 				$html = '<h3 class=\'aclheader\'>' . $what . '<table>' .
 				'<tr><th>Resource</th><th>Permission</th></tr>';
 				foreach ($this->resources as $res){//de rijen
-					$html .= '<tr><td>'.$res.'</td><td><input type="radio" name="'.$rol.'_'.$res.'" '.
-					'value="allow" checked="'.($this->acl->isAllowed($rol, $res)?'checked':'').'" />Allowed</label>'.
-					'<label for="'.$rol.'_'.$res.'"><input type="radio" name="'.$rol.'_'.$res.'" value="deny" checked="'.
-					($this->acl->isAllowed($rol, $res)?'':'checked').'" />Denied</label></td></tr>';
+				    $html .= $this->makeHtmlTableRow($res, $what, $this->RESOURCE);
 				}
 			}
 			$html .= '</table>';
 			$this->Acl_Html_Table = $html;
 		}
 	}
-
+	/**
+	 * Maakt tabel van Resources en Roles
+	 *
+	 * @param string $resources De resources
+	 * @param string $roles     De rollen
+	 * @param int	 $col_type	ROLE of RESOURCE
+	 * @return string Html Table
+	 */
+	private function makeHtmlTableRow($res, $rol, $col_type){
+				if($col_type == $this->RESOURCE) {
+				    $col_name = $res;
+				}elseif ($col_type === $this->ROLE){
+				    $col_name = $rol;
+				}else{
+				    throw new Manage_Acl_Exception('false constant used: ' . $col_type);
+				}
+	            $html = '<tr><td>'.$col_name.'</td><td><label for="'.$rol.'_'.$res.'"><input type="radio" name="'.$rol.'_'.$res.'"'.
+				'value="allow" checked="'.($this->acl->isAllowed($rol, $res)?'checked':'').'" />Allowed</label>'.
+				'<label for="'.$rol.'_'.$res.'"><input type="radio" name="'.$rol.'_'.$res.'" value="deny" checked="'.
+				($this->acl->isAllowed($rol, $res)?'':'checked').'" />Denied</label></td></tr>';
+				return $html;
+	    }
 	/**
 	 * Deze functie zet de rollen in $roles als een array
 	 *
