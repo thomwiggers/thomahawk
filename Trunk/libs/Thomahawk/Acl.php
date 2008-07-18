@@ -4,14 +4,14 @@
  */
 // opstarten:
 $depth = 1;
-$resource = 'manage_acl';
-require_once '../inc/initialisatie.php';
+$resource = 'Thomahawk_Acl';
+require_once '../../inc/initialisatie.php';
 /**
  * class die Acl beheert
  *
- * @throws Manage_Acl_Exception
+ * @throws Thomahawk_Acl_Exception
  */
-class Manage_Acl
+class Thomahawk_Acl
 {
 	/**
 	 * Var die acl class bevat
@@ -43,13 +43,13 @@ class Manage_Acl
 	 * Constructor van class die $acl instelt
 	 *
 	 * @param Zend_Acl $acl
-	 * @return Manage_Acl
+	 * @return Thomahawk_Acl
 	 */
-	function Manage_Acl (Zend_Acl $acl)
+	function Thomahawk_Acl (Zend_Acl $acl)
 	{
 		// als $acl niet bestaat, stoppen
 		if (! isset($acl)) {
-			throw new Manage_Acl_Exception('Failed to load ACL');
+			throw new Thomahawk_Acl_Exception('Failed to load ACL');
 		}
 		$this->acl = $acl;
 	}
@@ -102,7 +102,7 @@ class Manage_Acl
 		} elseif ($col_type === self::ROLE) {
 			$col_name = $rol;
 		} else {
-			throw new Manage_Acl_Exception('false constant used: ' . $col_type);
+			throw new Thomahawk_Acl_Exception('false constant used: ' . $col_type);
 		}
 		$html = '<tr><td>' . $col_name . '</td><td><label for="' . $rol . '_' .
 				 $res . '"><input type="radio" name="' . $rol . '_' . $res . '"' .
@@ -115,6 +115,7 @@ class Manage_Acl
 	}
 
 	function editAcl($role, $resource, $allow){
+		try {
 		switch ($allow) {
 			case 0:
 			$this->acl->deny($role, $resource);
@@ -122,8 +123,11 @@ class Manage_Acl
 			case 1:
 			$this->acl->allow($role,$resource);
 			default:
-			throw new Manage_Acl_Exception('False parameter allow');
+			throw new Thomahawk_Acl_Exception('False parameter ' . $allow);
 			break;
+		}
+		}catch (Exception $e){
+			throw new Thomahawk_Acl_Exception($e->getMessage());
 		}
 	}
 
@@ -149,7 +153,7 @@ class Manage_Acl
 	function setResources ()
 	{
 		if (empty($this->resources)) {
-			require_once '../conf/resources.php';
+			require_once '../../conf/resources.php';
 			$this->resources = $resources;
 		}
 	}
@@ -219,11 +223,10 @@ class Manage_Acl
 					})
 					}
 			);
-	});
-</script>
+	});</script>
 <?php
 	return true;
 	}
 }
-class Manage_Acl_Exception extends Exception
-{}
+class Thomahawk_Acl_Exception extends Exception
+{ }
