@@ -9,7 +9,7 @@ try {
 			$downpath .= '../';
 			--$depth;
 		}
-		echo $downpath . "\n";
+//		echo $downpath . "\n";
 		//libs bij include path
 		$dir = realpath(dirname(__FILE__) . $downpath); //Klopt waarschijnlijk niet
 		set_include_path($dir . DIRECTORY_SEPARATOR . 'libs' . DIRECTORY_SEPARATOR . PATH_SEPARATOR . get_include_path());

@@ -5,7 +5,7 @@
 // opstarten:
 $depth = 1;
 $resource = 'Thomahawk_Acl';
-require_once '../../inc/initialisatie.php';
+
 /**
  * class die Acl beheert
  *
@@ -45,7 +45,7 @@ class Thomahawk_Acl
 	 * @param Zend_Acl $acl
 	 * @return Thomahawk_Acl
 	 */
-	function Thomahawk_Acl (Zend_Acl $acl)
+	function Thomahawk_Acl ($acl)
 	{
 		// als $acl niet bestaat, stoppen
 		if (! isset($acl)) {
@@ -65,7 +65,7 @@ class Thomahawk_Acl
 			$this->setResources(); //zelfde voor resources
 			$html = '';
 			foreach ($this->resources as $res) {
-				$html .= '<h3 class=\'aclheader\'>' . $res . '<table>' . '<tr><th>Group</th><th>Permission</th></tr>';
+				$html .= '<h3 class=\'aclheader\'>' . $res . '</h3><table><tr><th>Group</th><th>Permission</th></tr>';
 				foreach ($this->roles as $rol) {
 					$this->makeHtmlTableRow($res, $rol, self::ROLE);
 				}
@@ -73,12 +73,12 @@ class Thomahawk_Acl
 		} else { //als $what NIET leeg is
 			if ($this->acl->has($what)) { //is het een Resource?
 				$res = $what;
-				$html = '<h3 class=\'aclheader\'>' . $res . '<table>' . '<tr><th>Group</th><th>Permission</th></tr>';
+				$html = '<h3 class=\'aclheader\'>' . $res . '<h3><table><tr><th>Group</th><th>Permission</th></tr>';
 				foreach ($this->roles as $rol) { //de rijen
 					$html .= $this->makeHtmlTableRow($what, $rol, self::ROLE);
 				}
 			} elseif ($this->acl->hasRole($what)) { //of is het een Role
-				$html = '<h3 class=\'aclheader\'>' . $what . '<table>' . '<tr><th>Resource</th><th>Permission</th></tr>';
+				$html = '<h3 class=\'aclheader\'>' . $what . '</h3><table><tr><th>Resource</th><th>Permission</th></tr>';
 				foreach ($this->resources as $res) { //de rijen
 					$html .= $this->makeHtmlTableRow($res, $what, self::RESOURCE);
 				}
@@ -95,7 +95,7 @@ class Thomahawk_Acl
 	 * @param int	 $col_type	ROLE of RESOURCE
 	 * @return string Html Table
 	 */
-	private function makeHtmlTableRow ($res, $rol, $col_type)
+	public function makeHtmlTableRow ($res, $rol, $col_type)
 	{
 		if ($col_type === self::RESOURCE) {
 			$col_name = $res;
@@ -105,7 +105,7 @@ class Thomahawk_Acl
 			throw new Thomahawk_Acl_Exception('false constant used: ' . $col_type);
 		}
 		$html = '<tr><td>' . $col_name . '</td><td><label for="' . $rol . '_' .
-				 $res . '"><input type="radio" name="' . $rol . '_' . $res . '"' .
+				 $res . '"><input type="radio" name="' . $rol . '_' . $res . '" ' .
 				 'value="allow" checked="' . ($this->acl->isAllowed($rol, $res) ? 'checked' : '') .
 				 '" />Allowed</label>' . '<label for="' . $rol . '_' . $res .
 				 '"><input type="radio" name="' . $rol . '_' . $res . '" value="deny" checked="' .
