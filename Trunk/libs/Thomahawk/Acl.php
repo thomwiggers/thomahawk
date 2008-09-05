@@ -2,13 +2,14 @@
 /**
  * Beheer ACL
  */
-// opstarten:
-$depth = 1;
-$resource = 'Thomahawk_Acl';
 
 /**
+ * @name Thomahawk_Acl
+ * 
  * class die Acl beheert
- *
+ * 
+ * 
+ * @version 1
  * @throws Thomahawk_Acl_Exception
  */
 class Thomahawk_Acl
