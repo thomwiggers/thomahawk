@@ -21,10 +21,10 @@ class Usercontrol {
 	}
 	
 	function queryUser ($userid){
-		$query = $this->db->select();
-		$query->from($prefix.'users');
+		$query = new Zend_Db_Select($this->db);
+		$query->from($this->prefix.'users');
 		$query->where('id = ?', $userid);
-		
+		$result = $query->query();
 	}
 }
 ?>
