@@ -42,7 +42,8 @@ class CategoryController extends Zend_Controller_Action
 		$tabel = new $clsname;
 		unset($clsname);
 		
-		$tabel->makelist($this->_request->getParam('where', 'null'));
+		$tabel->makelist($this->_request->getParam('where', 'null'),
+						$this->_request->getParam('offset', 0));
 		
 	}
 	
