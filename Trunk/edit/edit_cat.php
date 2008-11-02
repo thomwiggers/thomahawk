@@ -17,7 +17,7 @@ $db_ini = new Zend_Config_Ini('../conf/config.ini', 'database');
 
 if (isset($_GET['submit'])) {
 	$log->edit($ini->name . ' => ' . $id ); //loggen
-	$db = Zend_Db::factory('mysqli', $db_ini->db->toArray()); //$db instance
+	$db = Zend_Db::factory($db_ini->db->type, $db_ini->db->toArray()); //$db instance
 	$cols = array();	//array van colommen
 	for($i = 1; $i >= $ini->db->field->count; ++$i){
 		$fieldno = (string) 'field' . (string) $id;
