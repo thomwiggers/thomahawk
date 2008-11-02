@@ -23,16 +23,34 @@ class CategoryController extends Zend_Controller_Action
 	}
 	
 	public function viewAction() {
+		$a = $this->requiretabel();
+		$tabel = $a['tabel'];
+		unset($a); 
+		$tabel->makelist($this->getRequest()->getParam('where', 'null'),
+						$this->getRequest()->getParam('offset', 0));
+		
+	}
+	
+	
+	public function editAction() {
+		$a = $this->requiretabel();
+		$tabel = $a['tabel']; 
+		unset($a);
+		$input = $this->getRequest()->getParams();
+		$tabel->insert($input);
+	}
+	
+	private function requiretabel() {
 		/*
 		 * link: /category/view/cat/BLA
 		 */
-		$cat = $this->_request->getParam('cat', $this->throwException('no cat id'));
+		
+		$cat = $this->getRequest()->getParam('cat', $this->throwException('no cat id'));
 							//.php|.html | ../ | ..\
 		$cat = (preg_match('/(\.php|\.html|\.\./|\.\.\\)/') ? $this->_throwException(
 				$cat . ' is geen valid id', 666)
 				: $cat);
 		require_once 'categories/' . $cat . 'Table.php';
-		
 		$clsname = $cat . "Table";
 		
 		/**
@@ -40,12 +58,10 @@ class CategoryController extends Zend_Controller_Action
 		 * @type CategoryTable
 		 */
 		$tabel = new $clsname;
-		unset($clsname);
-		
-		$tabel->makelist($this->_request->getParam('where', 'null'),
-						$this->_request->getParam('offset', 0));
-		
-	}
+		return array('cat' => $cat, 'clsname' => $clsname, 'tabel' => $tabel);
+}
+	
+	
 	
 	private function _throwException($msg, $code = null) {
 		/*

@@ -42,7 +42,7 @@ class CategoryTable extends Zend_Db_Table_Abstract
 				if (array_search($col, $this->settings))
 				{ 
 					$collist .= 'AES_DECRYPT(`'.$col.'`,`'.$this->_pw.'`), ';
-				}else { $collist .= $col.','; }
+				} else $collist .= '`'. $col.'`,';
 		}
 		// laatste ", " eraf
 		$collist = substr ($collist, 0, -2);
@@ -53,11 +53,14 @@ class CategoryTable extends Zend_Db_Table_Abstract
 	}
 	
 	
-    public function insert(array $data)
+    public function insert(array $input)
     {
-    	
-    	
-        // key = kolom met wachtwoord
+    	//controleer of de input bestaat
+    	//zo ja: overzetten naar andere array
+    	foreach ($input as $k => $v){
+    		if (array_search($v, $this->_cols)) $data[$k] = $v;
+    	}
+    	// key = kolom met wachtwoord
         if (empty($data['key'])) throw new CategoryTableException('Verplicht veld weggelaten');
         $data['key'] = 'AES_ENCRYPT(`'. $data['key'].'` , `'. $this->_pw . "`)";
         return parent::insert($data);
@@ -70,12 +73,8 @@ class CategoryTable extends Zend_Db_Table_Abstract
         }
         return parent::update($data, $where);
     }
-    
-    
-    
-    
-    
-	/**
+          
+    /**
 	 * @throws CategoryTableException
 	 */
 	public function get_pw ()
